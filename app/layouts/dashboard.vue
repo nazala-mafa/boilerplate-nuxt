@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import type { NavigationMenuItem } from '@nuxt/ui';
+import DropdownProfileMenu from '~/components/layouts/DropdownProfileMenu.vue';
 
     const items: NavigationMenuItem[] = [{
         label: 'Home',
@@ -7,7 +8,7 @@
         href: '/'
     }, {
         label: 'Products',
-        icon: 'i-lucide-box',
+        icon: 'i-lucide-box',   
         href: '/product'
     }, {
         label: 'Users',
@@ -37,7 +38,7 @@
             <template #header>
                 <UDashboardNavbar title="Home">
                     <template #right>
-                        <UAvatar size="xl" :src="gravatarUrl('text@example.com')" />
+                        <DropdownProfileMenu />
                     </template>
                 </UDashboardNavbar>
             </template>
