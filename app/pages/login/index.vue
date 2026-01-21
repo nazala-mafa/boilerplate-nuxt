@@ -2,6 +2,7 @@
     definePageMeta({
         layout: 'guest'
     })
+
     import * as z from 'zod';
     import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui';
 
@@ -32,12 +33,20 @@
 
     type Schema = z.output<typeof schema>
 
-    function onSubmit(payload: FormSubmitEvent<Schema>) {
-        console.log('Submitted', payload);
+    const { $api } = useNuxtApp()
+
+    async function onSubmit(payload: FormSubmitEvent<Schema>) {
+        const log = await $api('/login', {
+            method: 'POST',
+            body: payload.data as Schema
+        })
+        console.log('log', log);
     }
 </script>
 
 <template>
+    <title>Boilerplate | Login Page</title>
+
     <div class="flex flex-col items-center justify-center gap-4 p-4">
         <UPageCard class="w-full max-w-md">
             <UAuthForm
