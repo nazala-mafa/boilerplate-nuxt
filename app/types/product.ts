@@ -1,4 +1,4 @@
-import type { PaginatedData } from "./paginatedData"
+import type { PaginatedCursorData, PaginatedData } from "./paginatedData"
 import type { User } from "./user"
 
 export interface Product {
@@ -20,3 +20,5 @@ export interface ProductForm {
 }
 
 export interface ProductPaginatedData extends PaginatedData <Product> {}
+
+export interface ProductPaginatedCursorData extends PaginatedCursorData <Product> {}
