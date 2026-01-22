@@ -1,6 +1,6 @@
 <script setup lang="ts">
     const route = useRoute()
-    const title = computed(() => route.meta.title as string)
+    const title = computed(() => route.meta.title as string);
 
     import type { NavigationMenuItem } from '@nuxt/ui';
     import DropdownProfileMenu from '~/components/layouts/DropdownProfileMenu.vue';
@@ -21,6 +21,7 @@
 </script>
 
 <template>
+    <title>{{ title || 'Boilerplate' }}</title>
     <UDashboardGroup>
         <UDashboardSidebar
             open
@@ -39,7 +40,7 @@
 
         <UDashboardPanel>
             <template #header>
-                <UDashboardNavbar :title="`${title}`">
+                <UDashboardNavbar :title="title || 'Boilerplate'">
                     <template #right>
                         <DropdownProfileMenu />
                     </template>
