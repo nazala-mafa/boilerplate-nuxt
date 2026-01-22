@@ -54,7 +54,7 @@
                 message: string,
                 user: User
             }
-            
+
             useAuth().setUser(user)
 
             navigateTo('/');

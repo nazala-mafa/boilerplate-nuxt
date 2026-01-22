@@ -1,4 +1,7 @@
 <script setup lang="ts">
+    const route = useRoute()
+    const title = computed(() => route.meta.title as string)
+
     import type { NavigationMenuItem } from '@nuxt/ui';
     import DropdownProfileMenu from '~/components/layouts/DropdownProfileMenu.vue';
 
@@ -36,7 +39,7 @@
 
         <UDashboardPanel>
             <template #header>
-                <UDashboardNavbar title="Home">
+                <UDashboardNavbar :title="`${title}`">
                     <template #right>
                         <DropdownProfileMenu />
                     </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import type { DropdownMenuItem } from '@nuxt/ui';
+    const { $api } = useNuxtApp();
 
     const items = ref<DropdownMenuItem[][]>([
         [
@@ -15,9 +16,17 @@
                 icon: 'i-lucide-log-out',
                 onSelect: async (e) => {
                     e.preventDefault();
-                    await $fetch('/logout', { method: 'DELETE' })
+
+                    const { message } = await $api('/logout', { method: 'POST' }) as { message: string };
+
+                    useToast().add({ 
+                        title: 'Authentication',
+                        description: message 
+                    });
+
                     useAuth().setUser(null);
-                    return navigateTo('/login')
+
+                    return navigateTo('/login');
                 }
             },
         ]

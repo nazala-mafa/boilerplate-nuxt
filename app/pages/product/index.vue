@@ -1,11 +1,18 @@
 <script setup lang="ts">
     definePageMeta({
-        layout: 'dashboard'
+        layout: 'dashboard',
+        title: 'Products',
     })
+
+    const { $api } = useNuxtApp();
+    const products = $api('/api/product')
+
+    console.log(products);
+    
 </script>
 
 <template>
     <UMain>
-        <h1>Product</h1>
+         
     </UMain>
 </template>
