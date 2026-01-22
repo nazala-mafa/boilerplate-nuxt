@@ -4,7 +4,11 @@
     })
 
     import * as z from 'zod';
-    import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui';
+    import type { FormSubmitEvent, AuthFormField, FormError } from '@nuxt/ui';
+
+    import type { User } from '~/types/user';
+    import { useAuth } from '~/stores/auth';
+    import type { ValidationErrors } from '~/types/validationErrors';
 
     const toast = useToast()
 
@@ -14,21 +18,27 @@
         label: 'Email',
         placeholder: 'Enter your email',
         required: true,
+        defaultValue: 'test@example.com',
     }, {
         name: 'password',
         type: 'password',
         label: 'Password',
         placeholder: 'Enter your password',
-        required: true
+        required: true,
+        defaultValue: 'passwordd'
     }, {
         name: 'remember',
         type: 'checkbox',
         label: 'Remember me',
+        defaultValue: false,
     }]
 
+    z.config(z.locales.id())
+
     const schema = z.object({
-        email: z.email('Invalid email'),
-        password: z.string('Password is required').min(4, 'Must be at least 4 characters')
+        email: z.email(),
+        password: z.string().min(4),
+        remember: z.boolean().nullable()
     })
 
     type Schema = z.output<typeof schema>
@@ -36,11 +46,28 @@
     const { $api } = useNuxtApp()
 
     async function onSubmit(payload: FormSubmitEvent<Schema>) {
-        const log = await $api('/login', {
-            method: 'POST',
-            body: payload.data as Schema
-        })
-        console.log('log', log);
+        try {
+            const { user } = await $api('/login', {
+                method: 'POST',
+                body: payload.data as Schema
+            }) as {
+                message: string,
+                user: User
+            }
+            
+            useAuth().setUser(user)
+
+            navigateTo('/');
+        } catch (error: unknown) {
+            const { data } = error as {data: ValidationErrors}
+            const message = data.errors.email?.[0]
+            if (message) {
+                toast.add({
+                    title: 'Sign in failed',
+                    description: message
+                })
+            }
+        }
     }
 </script>
 
@@ -56,7 +83,7 @@
                 icon="i-lucide-lock"
                 @submit="onSubmit"
                 :submit="{
-                    label: 'Sign in'
+                    label: 'Sign in',
                 }"
             >
                 <template #description>

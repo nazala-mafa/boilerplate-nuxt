@@ -13,9 +13,10 @@
             {
                 label: 'Logout',
                 icon: 'i-lucide-log-out',
-                onSelect: (e) => {
+                onSelect: async (e) => {
                     e.preventDefault();
-                    console.log('logout attempt');
+                    await $fetch('/logout', { method: 'DELETE' })
+                    useAuth().setUser(null);
                     return navigateTo('/login')
                 }
             },

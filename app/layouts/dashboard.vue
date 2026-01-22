@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import type { NavigationMenuItem } from '@nuxt/ui';
-import DropdownProfileMenu from '~/components/layouts/DropdownProfileMenu.vue';
+    import DropdownProfileMenu from '~/components/layouts/DropdownProfileMenu.vue';
 
     const items: NavigationMenuItem[] = [{
         label: 'Home',
