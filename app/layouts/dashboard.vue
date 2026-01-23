@@ -5,19 +5,20 @@
     import type { NavigationMenuItem } from '@nuxt/ui';
     import DropdownProfileMenu from '~/components/layouts/DropdownProfileMenu.vue';
 
-    const items: NavigationMenuItem[] = [{
+    const items = computed<NavigationMenuItem[]>(() => [{
         label: 'Home',
         icon: 'i-lucide-house',
         href: '/'
     }, {
         label: 'Products',
         icon: 'i-lucide-box',   
-        href: '/product'
+        href: '/product',
+        active: /^\/product/.test(route.path)
     }, {
         label: 'Users',
         icon: 'i-lucide-users',
         href: '/user'
-    }];
+    }])
 </script>
 
 <template>
