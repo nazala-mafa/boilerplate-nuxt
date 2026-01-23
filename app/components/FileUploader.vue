@@ -21,7 +21,12 @@
 </script>
 
 <template>
+    <div v-if="value === null && !!fileUrl" class="overflow-hidden">
+        <UButton icon="i-lucide-x" size="xs" color="neutral" class="rounded-full absolute -top-2 -right-2 cursor-pointer" @click="fileUrl = undefined" />
+        <img :src="fileUrl" class="h-48 w-full object-cover rounded" />
+    </div>
     <UFileUpload
+        v-else
         v-model="value"
         v-on:update:model-value="(e) => {
             if (e) {

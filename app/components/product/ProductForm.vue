@@ -19,18 +19,22 @@
 
     export type Schema = z.output<typeof schema>
 
-    const state = reactive({
-        id: null,
-        user: undefined,
-        name: '',
-        description: '',
-        price: 0,
-        image_url: '',
-    })
-
-    const { onSubmit } = defineProps<{
-        onSubmit: (data: Schema) => void
+    const { onSubmit, defaultProduct } = defineProps<{
+        onSubmit: (data: Schema) => void,
+        defaultProduct?: Product
     }>()
+
+    const state = reactive({
+        id: defaultProduct?.id || null,
+        user: defaultProduct?.user && {
+            label: defaultProduct?.user.name,
+            value: defaultProduct?.user.id,
+        },
+        name: defaultProduct?.name,
+        description: defaultProduct?.description,
+        price: defaultProduct?.price,
+        image_url: defaultProduct?.image_url,
+    })
 
     async function _onSubmit(event: FormSubmitEvent<Schema>) {
         onSubmit(event.data)
@@ -38,7 +42,7 @@
 </script>
 
 <template>
-    <UForm :schema="schema" :state="state" @submit="_onSubmit" class="space-y-4">
+    <UForm :schema="schema" :state="state" @submit="_onSubmit" class="space-y-5" id="product-form" v-on:error="(err) => console.log(err)">
         <SelectUserInput v-model="state.user" />
 
         <UFormField label="Name" name="name">
@@ -56,11 +60,5 @@
         <UFormField label="Image" name="image_url">
             <FileUploader v-model="state.image_url" path="product" />
         </UFormField>
-
-        <div class="flex justify-end">
-            <UButton type="submit">
-                Submit
-            </UButton>
-        </div>
     </UForm>
 </template>
