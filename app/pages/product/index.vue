@@ -19,8 +19,8 @@
     const { $api } = useNuxtApp();
 
     const { data: products, refetch } = useQuery({
-        queryKey: computed(() => ['products', query.value]),
-        queryFn: async () => await $api(`/api/product`, { query: query.value }) as { datas: ProductPaginatedData },
+        queryKey: computed(() => ['users', query.value]),
+        queryFn: async () => await $api(`/api/product`, { query: query.value }) as ProductPaginatedData,
     })    
 
     const columns: TableColumn<Product>[] = [
@@ -115,12 +115,7 @@
         </UCard>
 
         <UCard>
-            <UTable :data="products?.datas.data" :columns="columns" :empty="'lagi kosong'">
-                <template #number-cell="{ row }">
-                    <div class="flex justify-center">
-                        {{ row.index + (products?.datas?.from || 0) }}
-                    </div>
-                </template>
+            <UTable :data="products?.data" :columns="columns" empty="Product is empty">
                 <template #price-cell="{ row }">
                     <div class="flex justify-end">
                         Rp. {{ row.original.price?.toLocaleString('id') }}
@@ -139,7 +134,7 @@
             </UTable>
 
             <template #footer>
-                <Pagination v-if="products?.datas.links" :links="products?.datas.links" />
+                <Pagination v-if="products" :paginated_data="products" />
             </template>
         </UCard>
     </UMain>
