@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    import { refDebounced } from '@vueuse/core'
     import type { DropdownMenuItem, TableColumn } from '@nuxt/ui';
     import { useQuery } from '@tanstack/vue-query';
     import { useConfirmDialog } from '~/composeable/useCofirmDialog';
@@ -11,7 +12,8 @@
 
     const route = useRoute()
     const query = computed(() => ({
-        page: Number(route.query.page ?? 1)
+        page: Number(route.query.page ?? 1),
+        search: route.query.search ?? ''
     }))
 
     const { $api } = useNuxtApp();
@@ -78,6 +80,21 @@
         ]
     }
     
+    console.log('render');
+
+    const search = ref<string>(typeof query.value?.search === 'string' ? query.value.search : '')
+    const debouncedSearch = refDebounced(search, 400);
+
+    const router = useRouter()
+    const onSearch = () => {
+        router.push({
+            query: {
+                ...query.value,
+                page: 1,
+                search: debouncedSearch.value
+            }
+        })
+    }
 </script>
 
 <template>
@@ -86,6 +103,17 @@
             <NuxtLink href="/product/create">
                 <UButton>Create Product</UButton>
             </NuxtLink>
+        </UCard>
+
+        <UCard class="mb-6">
+            <div class="flex justify-end items-center gap-2">
+                <UInput
+                    type="search"
+                    placeholder="Owner, Name ..."
+                    v-model="search"
+                />
+                <UButton icon="i-lucide-filter" @click="onSearch" />
+            </div>
         </UCard>
 
         <UCard>
