@@ -7,30 +7,34 @@
     const state = ref<UserOption[]>()
 
     const appUrl = useRuntimeConfig().public.appUrl
+    const { $api } = useNuxtApp()
 
     // transform ids to object
-    const transformIdsToObject = async () => {
+    onMounted(async () => {
         if (model.value == '') {
             state.value = [];
             return;
         }
         
-        const { data: users } = await useFetch(`${appUrl}/api/user/select`, {
-            params: { ids: model },
-            credentials: 'include',
-            transform: (data: UserPaginatedCursorData) => {
-                return data.data.map(user => ({
-                    label: user.name,
-                    value: user.id,
-                })) as UserOption[]
-            }
-        })
+        const { data } = await $api(`/api/user/select`, {
+            query: { ids: model },
+        }) as UserPaginatedCursorData
 
-        if (!users.value?.length) return;
+        const users = data.map(item => ({
+            label: item.name,
+            value: item.id,
+        }));
 
-        state.value = users.value
-    };
-    onMounted(transformIdsToObject)
+        if (!users.length) return;
+
+        state.value = users
+    });
+    watch(model, () => {
+        if (model.value == '') {
+            state.value = [];
+            return;
+        }
+    });
 
     // transform object to ids
     watch(state, () => {
