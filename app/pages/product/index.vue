@@ -1,9 +1,9 @@
 <script setup lang="ts">
-    import { refDebounced } from '@vueuse/core'
-    import type { DropdownMenuItem, TableColumn } from '@nuxt/ui';
     import { useQuery } from '@tanstack/vue-query';
+    import type { DropdownMenuItem, TableColumn } from '@nuxt/ui';
     import { useConfirmDialog } from '~/composeable/useCofirmDialog';
     import type { Product, ProductPaginatedData } from '~/types/product';
+    import SelectMultipleUserInput from '~/components/user/SelectMultipleUserInput.vue';
 
     definePageMeta({
         layout: 'dashboard',
@@ -11,16 +11,12 @@
     })
 
     const route = useRoute()
-    const query = computed(() => ({
-        page: Number(route.query.page ?? 1),
-        search: route.query.search ?? ''
-    }))
 
     const { $api } = useNuxtApp();
 
     const { data: products, refetch } = useQuery({
-        queryKey: computed(() => ['users', query.value]),
-        queryFn: async () => await $api(`/api/product`, { query: query.value }) as ProductPaginatedData,
+        queryKey: computed(() => ['users', route.query]),
+        queryFn: async () => await $api(`/api/product`, { query: route.query }) as ProductPaginatedData,
     })    
 
     const columns: TableColumn<Product>[] = [
@@ -80,19 +76,25 @@
         ]
     }
 
-    const search = ref<string>(typeof query.value?.search === 'string' ? query.value.search : '')
-    const debouncedSearch = refDebounced(search, 400);
+    const search = ref<string>(String(route.query.search ?? ''));
+    const userIds = ref<string>(String(route.query.user_ids ?? ''));
 
     const router = useRouter()
     const onSearch = () => {
-        router.push({
-            query: {
-                ...query.value,
-                page: 1,
-                search: debouncedSearch.value
-            }
-        })
+        const query = {
+            search: search.value,
+            user_ids: userIds.value,
+            page: 1,
+        };        
+        router.push({ query });
     }
+
+    const onReset = () => {
+        search.value = '';
+        userIds.value = '';
+    }
+
+    const hasQueryParams = computed(() => Object.keys(route.query).length > 0);    
 </script>
 
 <template>
@@ -104,13 +106,17 @@
         </UCard>
 
         <UCard class="mb-6">
-            <div class="flex justify-end items-center gap-2">
-                <UInput
-                    type="search"
-                    placeholder="Owner, Name ..."
-                    v-model="search"
-                />
-                <UButton icon="i-lucide-filter" @click="onSearch" />
+            <div class="flex justify-between items-center">
+                <SelectMultipleUserInput v-model="userIds" />
+                <div class="flex justify-end items-center gap-2">
+                    <UInput
+                        type="search"
+                        placeholder="Owner, Name ..."
+                        v-model="search"
+                    />
+                    <UButton icon="i-lucide-filter" @click="onSearch" />
+                    <UButton icon="i-lucide-redo" href="/product" @click="onReset"/>
+                </div>
             </div>
         </UCard>
 

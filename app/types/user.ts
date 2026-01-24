@@ -1,4 +1,5 @@
 import type { PaginatedData } from "./paginatedData"
+import type { PaginatedCursorData } from "./paginatedData"
 
 export interface User {
     id: number
@@ -11,3 +12,4 @@ export interface User {
 }
 
 export interface UserPaginatedData extends PaginatedData <User> {}
+export interface UserPaginatedCursorData extends PaginatedCursorData <User> {}
