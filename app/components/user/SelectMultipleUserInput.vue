@@ -4,10 +4,21 @@
     import type { UserPaginatedCursorData } from '~/types/user'
 
     const model = defineModel<string>()
-    const state = ref<UserOption[]>()
+    const state = ref<UserOption[]>([])
 
     const appUrl = useRuntimeConfig().public.appUrl
-    const { $api } = useNuxtApp()
+    
+    const { data: selectedUserOption } = await useFetch(`${appUrl}/api/user/select`, {
+        credentials: 'include',
+        params: { ids: model },
+        immediate: model.value !== '' && state.value.length == 0,
+        transform: (data: UserPaginatedCursorData) => {
+            return data.data.map((item) => ({
+                label: item.name,
+                value: item.id,
+            }))
+        },
+    });
 
     // transform ids to object
     onMounted(async () => {
@@ -16,18 +27,9 @@
             return;
         }
         
-        const { data } = await $api(`/api/user/select`, {
-            query: { ids: model },
-        }) as UserPaginatedCursorData
-
-        const users = data.map(item => ({
-            label: item.name,
-            value: item.id,
-        }));
-
-        if (!users.length) return;
-
-        state.value = users
+        if (selectedUserOption.value == undefined) return;
+        
+        state.value = selectedUserOption.value
     });
     watch(model, () => {
         if (model.value == '') {
