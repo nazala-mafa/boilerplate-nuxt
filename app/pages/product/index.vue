@@ -56,6 +56,9 @@
                             title: 'Delete confirmation', 
                             description: 'Are you sure to delete this item? This item will deleted permanently.'
                         })) {
+                            await $api(`/api/product/${product.id}`, {
+                                method: 'DELETE',
+                            });
                             toast.add({
                                 title: 'Delete success',
                                 description: 'That item deleted successfully'
