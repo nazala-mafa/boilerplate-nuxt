@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import type { DropdownMenuItem, TableColumn } from '@nuxt/ui';
+    import { useQuery } from '@tanstack/vue-query';
     import { useConfirmDialog } from '~/composeable/useCofirmDialog';
     import type { Product, ProductPaginatedData } from '~/types/product';
 
@@ -8,11 +9,17 @@
         title: 'Products',
     })
 
+    const route = useRoute()
+    const query = computed(() => ({
+        page: Number(route.query.page ?? 1)
+    }))
+
     const { $api } = useNuxtApp();
 
-    const products = await $api('/api/product') as {
-        datas: ProductPaginatedData
-    }
+    const { data: products, refetch } = useQuery({
+        queryKey: computed(() => ['users', query.value]),
+        queryFn: async () => await $api(`/api/product`, { query: query.value }) as { datas: ProductPaginatedData },
+    })    
 
     const columns: TableColumn<Product>[] = [
         {
@@ -59,6 +66,7 @@
                             await $api(`/api/product/${product.id}`, {
                                 method: 'DELETE',
                             });
+                            await refetch();
                             toast.add({
                                 title: 'Delete success',
                                 description: 'That item deleted successfully'
@@ -81,7 +89,7 @@
         </UCard>
 
         <UCard>
-            <UTable :data="products.datas.data" :columns="columns">
+            <UTable :data="products?.datas.data" :columns="columns" :empty="'lagi kosong'">
                 <template #price-cell="{ row }">
                     <div class="flex justify-end">
                         Rp. {{ row.original.price?.toLocaleString('id') }}
@@ -98,6 +106,10 @@
                     </UDropdownMenu>
                 </template>
             </UTable>
+
+            <template #footer>
+                <Pagination v-if="products?.datas.links" :links="products?.datas.links" />
+            </template>
         </UCard>
     </UMain>
 </template>

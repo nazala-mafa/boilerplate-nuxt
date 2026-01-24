@@ -25,7 +25,6 @@
     <title>{{ title || 'Boilerplate' }}</title>
     <UDashboardGroup>
         <UDashboardSidebar
-            open
             toggle-side="right"
             resizable
         >
