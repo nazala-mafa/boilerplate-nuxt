@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import type { DropdownMenuItem, TableColumn } from '@nuxt/ui';
+    import { useConfirmDialog } from '~/composeable/useCofirmDialog';
     import type { Product, ProductPaginatedData } from '~/types/product';
 
     definePageMeta({
@@ -35,6 +36,9 @@
         }
     ]
 
+    const confirm = useConfirmDialog()
+    const toast = useToast()
+
     function getDropdownActions(product: Product): DropdownMenuItem[][] {
         return [
             [
@@ -46,7 +50,18 @@
                 {
                     label: 'Delete',
                     icon: 'i-lucide-trash',
-                    color: 'error'
+                    color: 'error',
+                    onSelect: async () => {
+                        if (await confirm({ 
+                            title: 'Delete confirmation', 
+                            description: 'Are you sure to delete this item? This item will deleted permanently.'
+                        })) {
+                            toast.add({
+                                title: 'Delete success',
+                                description: 'That item deleted successfully'
+                            })
+                        }
+                    }
                 }
             ]
         ]
