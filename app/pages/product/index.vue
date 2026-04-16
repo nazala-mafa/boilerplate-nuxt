@@ -19,14 +19,14 @@
     const { $api } = useNuxtApp();
 
     const { data: products, refetch } = useQuery({
-        queryKey: computed(() => ['users', query.value]),
+        queryKey: computed(() => ['products', query.value]),
         queryFn: async () => await $api(`/api/product`, { query: query.value }) as { datas: ProductPaginatedData },
     })    
 
     const columns: TableColumn<Product>[] = [
         {
-            accessorKey: 'id',
-            header: 'ID',
+            id: 'number',
+            header: '#',
         },
         {
             accessorKey: 'user.name',
@@ -79,8 +79,6 @@
             ]
         ]
     }
-    
-    console.log('render');
 
     const search = ref<string>(typeof query.value?.search === 'string' ? query.value.search : '')
     const debouncedSearch = refDebounced(search, 400);
@@ -118,6 +116,11 @@
 
         <UCard>
             <UTable :data="products?.datas.data" :columns="columns" :empty="'lagi kosong'">
+                <template #number-cell="{ row }">
+                    <div class="flex justify-center">
+                        {{ row.index + (products?.datas?.from || 0) }}
+                    </div>
+                </template>
                 <template #price-cell="{ row }">
                     <div class="flex justify-end">
                         Rp. {{ row.original.price?.toLocaleString('id') }}
