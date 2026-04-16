@@ -19,6 +19,13 @@ export default defineNuxtPlugin(() => {
                     'X-XSRF-TOKEN': token
                 }
             }
+        }, 
+        async onResponseError({ response }) {
+            if (response.status === 405) {
+                const auth = useAuth();
+                auth.setUser(null);
+                await navigateTo('/');
+            }
         }
     })
 
