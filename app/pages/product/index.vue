@@ -115,13 +115,20 @@
                         v-model="search"
                     />
                     <UButton icon="i-lucide-filter" @click="onSearch" />
-                    <UButton icon="i-lucide-redo" href="/product" @click="onReset"/>
+                    <UButton v-if="hasQueryParams" icon="i-lucide-redo" href="/product" @click="onReset"/>
                 </div>
             </div>
         </UCard>
 
-        <UCard>
+        <UCard 
+            :ui="{
+                body: 'sm:p-0'
+            }"
+        >
             <UTable :data="products?.data" :columns="columns" empty="Product is empty">
+                <template #id-cell="{ row }">
+                    <span>{{ row.index + Number(products?.from) }}</span>
+                </template>
                 <template #price-cell="{ row }">
                     <div class="flex justify-end">
                         Rp. {{ row.original.price?.toLocaleString('id') }}

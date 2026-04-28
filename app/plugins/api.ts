@@ -1,6 +1,9 @@
 export default defineNuxtPlugin(() => {
     const appUrl = useRuntimeConfig().public.appUrl;
 
+    const headers = new Headers();
+    headers.append('accept', 'application/json');
+
     const api = $fetch.create({
         baseURL: appUrl,
         credentials: 'include',
@@ -16,7 +19,8 @@ export default defineNuxtPlugin(() => {
                 options.headers = {
                     ...options.headers,
                     // @ts-expect-error custom headers, syarat csrf-token dari laravel
-                    'X-XSRF-TOKEN': token
+                    Accept: 'application/json',
+                    'X-XSRF-TOKEN': token,
                 }
             }
         }, 

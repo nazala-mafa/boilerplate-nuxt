@@ -17,6 +17,9 @@
     const { data: users, status } = await useFetch(`${appUrl}/api/user/select`, {
         params: { q: searchTermDebounced },
         credentials: 'include',
+        headers: {
+            Accept: 'application/json',
+        } as HeadersInit,
         transform: (data: ProductPaginatedCursorData) => {
             return data.data.map(user => ({
                 label: user.name,
