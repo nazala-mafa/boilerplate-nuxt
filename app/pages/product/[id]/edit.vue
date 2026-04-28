@@ -1,5 +1,6 @@
 <script setup lang="ts">
-    import ProductForm, { type Schema } from '~/components/product/ProductForm.vue';
+    import { useQueryClient } from '@tanstack/vue-query';
+import ProductForm, { type Schema } from '~/components/product/ProductForm.vue';
     import type { Product } from '~/types/product';
 
     definePageMeta({
@@ -15,6 +16,8 @@
         product: Product
     }
 
+    const queryClient = useQueryClient();
+
     async function onSubmit(data: Schema) {
         const { message } = await $api(`/api/product/${data.id}`, {
             method: 'PATCH',
@@ -29,6 +32,8 @@
         })
 
         navigateTo('/product');
+
+        queryClient.invalidateQueries({ queryKey: ['products'] });
     }
 </script>
 

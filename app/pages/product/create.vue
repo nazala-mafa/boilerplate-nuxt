@@ -1,5 +1,6 @@
 <script setup lang="ts">
-    import ProductForm, { type Schema } from '~/components/product/ProductForm.vue';
+    import { useQueryClient } from '@tanstack/vue-query';
+import ProductForm, { type Schema } from '~/components/product/ProductForm.vue';
 
     definePageMeta({
         layout: 'dashboard',
@@ -7,6 +8,8 @@
     })
 
     const { $api } = useNuxtApp()
+
+    const queryClient = useQueryClient();
 
     async function onSubmit(data: Schema) {        
         const { message } = await $api('/api/product', {
@@ -22,6 +25,8 @@
         })
 
         navigateTo('/product');
+
+        queryClient.invalidateQueries({ queryKey: ['products'] });
     }
 </script>
 
