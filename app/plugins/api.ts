@@ -4,6 +4,8 @@ export default defineNuxtPlugin(() => {
     const headers = new Headers();
     headers.append('accept', 'application/json');
 
+    const toast = useToast();
+
     const api = $fetch.create({
         baseURL: appUrl,
         credentials: 'include',
@@ -23,12 +25,15 @@ export default defineNuxtPlugin(() => {
                     'X-XSRF-TOKEN': token,
                 }
             }
-        }, 
-        async onResponseError({ response }) {
-            if (response.status === 405) {
-                const auth = useAuth();
-                auth.setUser(null);
-                await navigateTo('/');
+        },
+        async onResponseError({ response }) {            
+            if (response.status === 401) {
+                useAuth().setUser(null)
+                navigateTo('/login');
+                toast.add({
+                    title: 'Unautorized.',
+                    description: 'Your Session Expired.'
+                })
             }
         }
     })

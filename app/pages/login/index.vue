@@ -25,7 +25,7 @@
         label: 'Password',
         placeholder: 'Enter your password',
         required: true,
-        defaultValue: 'passwordd'
+        defaultValue: 'password'
     }, {
         name: 'remember',
         type: 'checkbox',

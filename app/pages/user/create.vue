@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    import { useQueryClient } from '@tanstack/vue-query';
     import UserForm, { type Schema } from '~/components/user/UserForm.vue';
 
     definePageMeta({
@@ -7,6 +8,8 @@
     })
 
     const { $api } = useNuxtApp()
+
+    const queryClient = useQueryClient();
 
     async function onSubmit(data: Schema) {        
         const { message } = await $api('/api/user', {
@@ -22,6 +25,8 @@
         })
 
         navigateTo('/user');
+     
+        queryClient.invalidateQueries({ queryKey: ['users'] });
     }
 </script>
 

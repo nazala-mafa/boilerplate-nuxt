@@ -2,12 +2,13 @@
     definePageMeta({
         layout: 'dashboard'
     })
+
+    const user = useAuth().user
 </script>
 
 <template>
     <title>Boilerplate</title>
     <UMain>
-        <h1>Hello World</h1>
-        <UButton label="test" color="primary" />
+        <h1>Welcome, {{ user?.name }}.</h1>
     </UMain>
 </template>

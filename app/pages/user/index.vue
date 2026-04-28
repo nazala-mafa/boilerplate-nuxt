@@ -1,47 +1,40 @@
 <script setup lang="ts">
-    import { refDebounced } from '@vueuse/core'
     import { useQuery } from '@tanstack/vue-query';
+    import type { DropdownMenuItem, TableColumn } from '@nuxt/ui';
     import { useConfirmDialog } from '~/composeable/useCofirmDialog';
     import type { User, UserPaginatedData } from '~/types/user';
-    import type { DropdownMenuItem, TableColumn } from '@nuxt/ui';
 
     definePageMeta({
         layout: 'dashboard',
-        title: 'User',
+        title: 'Users',
     })
 
     const route = useRoute()
-    const query = computed(() => ({
-        page: Number(route.query.page ?? 1),
-        search: route.query.search ?? ''
-    }))
 
     const { $api } = useNuxtApp();
 
     const { data: users, refetch } = useQuery({
-        queryKey: computed(() => ['users', query.value]),
-        queryFn: async () => await $api(`/api/user`, { query: query.value }) as { datas: UserPaginatedData },
+        queryKey: computed(() => ['users', route.query]),
+        queryFn: async () => await $api(`/api/user`, { query: route.query }) as UserPaginatedData,
     })
 
     const columns: TableColumn<User>[] = [
         {
-            id: 'number',
+            accessorKey: 'num',
             header: '#',
         },
         {
-            id: 'name',
             accessorKey: 'name',
             header: 'Name',
         },
         {
-            id: 'email',
             accessorKey: 'email',
             header: 'Email',
         },
         {
-            id: 'action',
+            id: 'action'
         }
-    ];
+    ]
 
     const confirm = useConfirmDialog()
     const toast = useToast()
@@ -78,19 +71,22 @@
         ]
     }
 
-    const search = ref<string>(typeof query.value?.search === 'string' ? query.value.search : '')
-    const debouncedSearch = refDebounced(search, 400);
+    const search = ref<string>(String(route.query.search ?? ''));
 
     const router = useRouter()
     const onSearch = () => {
-        router.push({
-            query: {
-                ...query.value,
-                page: 1,
-                search: debouncedSearch.value
-            }
-        })
+        const query = {
+            search: search.value,
+            page: 1,
+        };        
+        router.push({ query });
     }
+
+    const onReset = () => {
+        search.value = '';
+    }
+
+    const hasQueryParams = computed(() => Object.keys(route.query).length > 0);    
 </script>
 
 <template>
@@ -102,22 +98,27 @@
         </UCard>
 
         <UCard class="mb-6">
-            <div class="flex justify-end items-center gap-2">
-                <UInput
-                    type="search"
-                    placeholder="Email, Name ..."
-                    v-model="search"
-                />
-                <UButton icon="i-lucide-filter" @click="onSearch" />
+            <div class="flex justify-between items-center">
+                <div class="flex justify-end items-center gap-2">
+                    <UInput
+                        type="search"
+                        placeholder="Email, Name ..."
+                        v-model="search"
+                    />
+                    <UButton icon="i-lucide-filter" @click="onSearch" />
+                    <UButton v-if="hasQueryParams" icon="i-lucide-redo" href="/user" @click="onReset"/>
+                </div>
             </div>
         </UCard>
 
-        <UCard>
-            <UTable :data="users?.datas?.data" :columns="columns" :empty="'lagi kosong'">
-                <template #number-cell="{ row }">
-                    <div class="flex justify-center">
-                        {{ row.index + (users?.datas?.from || 0) }}
-                    </div>
+        <UCard 
+            :ui="{
+                body: 'sm:p-0'
+            }"
+        >
+            <UTable :data="users?.data" :columns="columns" empty="Product is empty">
+                <template #num-cell="{ row }">
+                    <span>{{ row.index + Number(users?.from) }}</span>
                 </template>
                 <template #action-cell="{ row }">
                     <UDropdownMenu :items="getDropdownActions(row.original)">
@@ -132,7 +133,7 @@
             </UTable>
 
             <template #footer>
-                <Pagination v-if="users?.datas?.links" :links="users?.datas?.links" />
+                <Pagination v-if="users" :paginated_data="users" />
             </template>
         </UCard>
     </UMain>

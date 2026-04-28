@@ -15,13 +15,13 @@
     const { $api } = useNuxtApp();
 
     const { data: products, refetch } = useQuery({
-        queryKey: computed(() => ['users', route.query]),
+        queryKey: computed(() => ['products', route.query]),
         queryFn: async () => await $api(`/api/product`, { query: route.query }) as ProductPaginatedData,
     })    
 
     const columns: TableColumn<Product>[] = [
         {
-            id: 'number',
+            accessorKey: 'num',
             header: '#',
         },
         {
@@ -126,7 +126,7 @@
             }"
         >
             <UTable :data="products?.data" :columns="columns" empty="Product is empty">
-                <template #id-cell="{ row }">
+                <template #num-cell="{ row }">
                     <span>{{ row.index + Number(products?.from) }}</span>
                 </template>
                 <template #price-cell="{ row }">

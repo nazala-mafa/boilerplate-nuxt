@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    import { useQueryClient } from '@tanstack/vue-query';
     import UserForm, { type Schema } from '~/components/user/UserForm.vue';
     import type { User } from '~/types/user';
 
@@ -11,9 +12,11 @@
 
     const { $api } = useNuxtApp();
 
-    const { user } = await $api(`/api/user/${id}`) as {
-        user: User
-    }
+    const { data: user } = await $api(`/api/user/${id}`) as {
+        data: User
+    }    
+
+    const queryClient = useQueryClient();
 
     async function onSubmit(data: Schema) {
         const { message } = await $api(`/api/user/${data.id}`, {
@@ -29,6 +32,9 @@
         })
 
         navigateTo('/user');
+     
+        queryClient.invalidateQueries({ queryKey: ['users'] });
+        queryClient.invalidateQueries({ queryKey: ['products'] });
     }
 </script>
 
@@ -50,5 +56,4 @@
             </div>
         </UCard>
     </div>
-
 </template>
